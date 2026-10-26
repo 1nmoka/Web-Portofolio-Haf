@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>HOLIK // SPATIAL.ARCHIVE — Urban Planning &amp; Spatial Visual Communication</title>
+
+<!-- Fonts: Playfair Display (Serif), Inter (Sans), JetBrains Mono (Mono) -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,800;0,900;1,300;1,400&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "base": "#F4F4F0",          
+            "surface": "#FFFFFF",       
+            "surface-hover": "#E5E5E0", 
+            "text-main": "#000000",     
+            "text-body": "#333333",     
+            "text-muted": "#777777",    
+            "accent": "#FF3300",        
+            "accent-light": "#FFE5E0",  
+            "border-light": "#D1D5DB",  
+            "border-dark": "#000000",   
+          },
+          fontFamily: {
+            "display": ["Playfair Display", "serif"], 
+            "body": ["Inter", "sans-serif"],
+            "mono": ["JetBrains Mono", "monospace"],
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    /* Memaksa semua sudut menjadi tajam (0px) - Anti AI Slop */
+    * {
+      border-radius: 0 !important;
+    }
+
+    body {
+      background-color: #F4F4F0;
+      color: #000000;
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+    }
+    
+    .amp {
+      font-family: 'Inter', sans-serif;
+      font-style: italic;
+      font-weight: 300;
+      opacity: 0.8;
+      letter-spacing: 0.05em;
+      margin: 0 0.1em;
+    }
+
+    .bg-grid-pattern {
+      background-size: 32px 32px;
+      background-image: linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+    }
+
+    .ruler-ticks {
+      background-image: repeating-linear-gradient(90deg, #000000 0px, #000000 1px, transparent 1px, transparent 10px);
+      opacity: 0.6;
+    }
+    .ruler-ticks-major {
+      background-image: repeating-linear-gradient(90deg, #FF3300 0px, #FF3300 1.5px, transparent 1.5px, transparent 50px);
+      opacity: 0.9;
+    }
+    .ticker-ruler-ticks {
+      background-image: repeating-linear-gradient(90deg, #000000 0px, #000000 1px, transparent 1px, transparent 8px);
+      opacity: 0.6;
+    }
+    .ticker-ruler-ticks-major {
+      background-image: repeating-linear-gradient(90deg, #FF3300 0px, #FF3300 1.5px, transparent 1.5px, transparent 40px);
+      opacity: 0.9;
+    }
+
+    .shadow-hard {
+      box-shadow: 4px 4px 0px #000000;
+      transition: all 0.2s;
+    }
+    .shadow-hard:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0px #000000;
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    ::selection {
+      background: #000000;
+      color: #FFFFFF;
+    }
+</style>
+</head>
+<body class="bg-base text-text-main antialiased font-body selection:bg-accent selection:text-white">
+
+<!-- NAVBAR -->
+<header class="sticky top-0 z-50 bg-base border-b-2 border-border-dark text-text-main relative">
+<div class="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
+  
+  <div class="flex items-center gap-3 font-mono text-[10px] md:text-[11px] uppercase tracking-[0.08em] text-black font-bold select-none">
+    <span>BANDUNG, (ID) //</span>
+    <span class="flex items-center gap-1.5 bg-black text-white px-2 py-0.5">
+      <span id="live-clock">10:51:54 WIB</span>
+    </span>
+  </div>
+
+  <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+    <a class="font-display font-black text-2xl md:text-3xl tracking-tighter uppercase text-black hover:text-accent transition-colors" href="#"><span>HAF</span></a>
+  </div>
+
+  <div class="flex items-center gap-4 md:gap-6">
+    <nav class="flex items-center gap-4 md:gap-6 font-mono text-[10px] md:text-[11px] uppercase tracking-widest font-bold text-black">
+      <a class="hover:bg-black hover:text-white px-2 py-1 transition-colors border border-transparent hover:border-black" href="#work">INDEKS</a>
+      <a class="hover:bg-black hover:text-white px-2 py-1 transition-colors border border-transparent hover:border-black hidden sm:inline" href="#capabilities">TENTANG</a>
+      <a class="hover:bg-black hover:text-white px-2 py-1 transition-colors border border-transparent hover:border-black" href="#contact">KONTAK</a>
+    </nav>
+  </div>
+
+</div>
+</header>
+
+<!-- MAIN WRAPPER -->
+<main class="max-w-7xl mx-auto px-4 md:px-6 lg:px-12 border-x-2 border-border-dark min-h-screen bg-base">
+  
+<!-- SECTION 1: HERO -->
+<section class="py-12 md:py-28 border-b-2 border-border-dark relative bg-grid-pattern">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-end">
+<div class="lg:col-span-8">
+<p class="font-mono text-[10px] md:text-[12px] uppercase tracking-widest text-black font-bold mb-4 bg-accent text-white inline-block px-2 py-1">
+            Urban Planning <span class="amp">&amp;</span> Spatial Visual Communication
+          </p>
+<h1 class="font-display text-5xl sm:text-6xl md:text-[85px] font-bold leading-[0.95] tracking-tighter text-black mb-6 md:mb-8">
+            I study <em class="italic text-accent">cities</em>, map patterns, and design visual <em class="italic text-accent">narratives</em>.
+          </h1>
+<p class="text-base md:text-xl text-text-body font-medium leading-relaxed max-w-2xl mb-8 md:mb-10 border-l-4 border-black pl-4">
+            I explore the intersection of spatial planning, computational cartography, and urban analysis to understand how cities grow, function, and evolve. My work combines GIS, spatial research, and clear visual communication to translate complex urban challenges into meaningful planning insights.
+          </p>
+<div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center font-mono text-[11px] md:text-[12px] tracking-wider uppercase font-bold">
+<a class="inline-flex items-center justify-center w-full sm:w-auto gap-2 px-6 py-4 bg-black text-white border-2 border-black hover:bg-white hover:text-black transition-colors shadow-hard" href="#work">
+<span>Explore Selected Work</span>
+<span class="material-symbols-outlined text-sm">arrow_downward</span>
+</a>
+<a class="inline-flex items-center justify-center w-full sm:w-auto gap-2 px-6 py-4 bg-white text-black border-2 border-black hover:bg-black hover:text-white transition-colors shadow-hard" href="#journal">
+<span>Read Spatial Journal</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</div>
+
+<!-- FOTO MUKA (HITAM PUTIH -> WARNA SAAT HOVER) -->
+<div class="lg:col-span-4 max-w-sm mx-auto w-full mt-8 lg:mt-0 lg:-ml-12 z-10 relative">
+<div class="border-2 border-black bg-white p-3 md:p-4 relative shadow-hard group">
+<div class="flex justify-between items-center text-[10px] font-mono font-bold text-black border-b-2 border-black pb-2 mb-3">
+<span>FIG. 00 — PRACTITIONER</span>
+<span class="text-accent">SCALE: 1:1</span>
+</div>
+<div class="aspect-[4/5] bg-gray-200 overflow-hidden relative border-2 border-black flex flex-col justify-end p-3 md:p-4">
+  <img src="https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/Foto%20Muka%20(Hero).jpeg" alt="Profile Photo" class="absolute inset-0 w-full h-full object-cover object-top transition-all duration-700 grayscale group-hover:grayscale-0 group-hover:scale-105">
+  
+<!-- KARTU NAMA DI DALAM FOTO -->
+<div class="relative z-10 bg-white p-3 border-2 border-black">
+<div class="text-accent text-[10px] font-mono mb-1 font-bold tracking-widest">IDENTITY VERIFIED</div>
+<div class="font-bold text-lg font-display text-black">Holik</div>
+<div class="text-black text-[10px] font-mono font-semibold">Urban Planner & Designer</div>
+</div>
+</div>
+<div class="mt-3 flex justify-between items-center text-[10px] font-mono font-bold text-black uppercase tracking-wider">
+<span>LOC: BANDUNG, ID</span>
+<span>EST: 2026</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- SECTION 2: WORK (3-PANEL SHOWCASE) -->
+<section class="py-12 md:py-20 border-b-2 border-border-dark" id="work">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-4 border-b-2 border-border-dark gap-4">
+<div>
+<div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
+<span class="font-mono text-[11px] text-white tracking-widest uppercase font-bold bg-black px-2 py-1">01 / ARCHIVAL CASE STUDIES</span>
+<span class="text-[10px] font-mono px-2 py-1 border-2 border-black text-black uppercase tracking-wider w-fit font-bold" id="activeSoftwareBadge">EPANET v2.2</span>
+</div>
+<h2 class="font-display text-3xl md:text-5xl font-bold text-black mt-2 md:mt-0" id="activeShowcaseTitle">Water Distribution Network Simulation</h2>
+</div>
+<div class="font-mono text-[10px] text-black font-bold flex items-center gap-2 uppercase border-2 border-black px-3 py-1.5 bg-white">
+<span class="size-2 rounded-full bg-accent animate-pulse"></span>
+<span>DYNAMIC MESH</span>
+</div>
+</div>
+<div class="mb-6 flex flex-col md:flex-row justify-between md:items-center text-xs text-black gap-3 pb-4 border-b border-border-dark font-medium">
+<p class="max-w-3xl leading-relaxed" id="activeNarrative">Hydraulic and water quality simulation of pressurized pipe networks. Integrates demand-driven analysis, extended period simulation, and water quality tracing for municipal water supply systems.</p>
+<div class="font-mono text-[10px] text-white bg-black flex items-center gap-1.5 flex-shrink-0 px-2 py-1 font-bold">
+<span class="material-symbols-outlined text-[14px]">tune</span>
+<span id="activeSpecTag">HYDRAULIC NETWORK</span>
+</div>
+</div>
+
+<!-- Grid 3-Panel -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 items-stretch transition-all duration-500" id="showcaseStage">
+<!-- LEFT PANEL -->
+<article class="lg:col-span-3 bg-white border-2 border-black p-4 flex flex-col justify-between shadow-hard" id="leftPanelCard">
+<div>
+<div class="flex justify-between items-center font-mono text-[10px] text-black uppercase tracking-wider pb-3 mb-3 border-b-2 border-black">
+<span class="bg-black text-white px-2 py-0.5 font-bold" id="leftBadge">PLATE // 01</span>
+<span class="font-bold" id="leftScale">NODE: 1,240</span>
+</div>
+<div class="aspect-[4/3] border-2 border-black mb-4 relative group">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" id="leftPhoto" style="background-image: url('https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/WaterCad.Jpg');"></div>
+<div class="absolute bottom-2 left-2 bg-accent text-white px-2 py-1 text-[9px] font-mono font-bold border-2 border-black" id="leftOverlay">PRESSURE: 45 PSI</div>
+</div>
+<h3 class="font-display text-xl font-bold text-black mb-2" id="leftTitle">Network Topology &amp; Demand Nodes</h3>
+<p class="text-xs text-black leading-relaxed font-medium" id="leftDesc">Spatial distribution of demand nodes, pipe segments, and hydraulic junctions across the service area.</p>
+</div>
+<div class="border-t-2 border-black pt-3 mt-4 flex items-center justify-between font-mono text-[10px] text-black font-bold">
+<span class="bg-black text-white px-2 py-0.5" id="leftMetric">FLOW: 320 L/S</span>
+<span class="flex items-center gap-1 cursor-pointer hover:text-accent transition-colors">
+        Inspect <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</span>
+</div>
+</article>
+
+<!-- CENTER PANEL (VIDEO/GAMBAR UTUH DENGAN OBJECT-CONTAIN) -->
+<article class="lg:col-span-6 bg-white text-black p-4 md:p-5 flex flex-col justify-between relative overflow-hidden border-2 border-black shadow-hard" id="centerPanelCard">
+<div>
+<div class="flex flex-col sm:flex-row justify-between sm:items-center font-mono text-[10px] text-black uppercase tracking-wider pb-3 mb-3 border-b-2 border-black gap-2">
+<div class="flex items-center gap-2">
+<span class="bg-black text-white px-2 py-0.5 font-bold" id="mediaTypeBadge">● LIVE SIMULATION</span>
+<span class="text-accent font-bold hidden md:inline">[PRIMARY FOCUS]</span>
+</div>
+<span class="text-black font-bold" id="mediaResolution">60 FPS</span>
+</div>
+<!-- KOTAK MEDIA -->
+<div class="w-full h-[250px] sm:h-[350px] md:h-[400px] border-2 border-black mb-4 relative group bg-black">
+  <!-- VIDEO ELEMENT -->
+  <video id="primaryVideo" class="absolute inset-0 w-full h-full object-contain transition-opacity duration-500 hidden" loop muted playsinline autoplay>
+    <source id="primaryVideoSrc" src="" type="video/mp4">
+  </video>
+  <!-- IMAGE ELEMENT -->
+  <img id="primaryImage" src="" class="absolute inset-0 w-full h-full object-contain transition-all duration-500 hidden" alt="Project Preview">
+  
+<div class="absolute z-10 top-2 left-2 bg-white text-black px-2 py-1 text-[10px] font-mono font-bold border-2 border-black">
+<span id="mediaTelemetryTag">WATER MODEL</span>
+</div>
+<div class="absolute z-10 bottom-2 right-2 bg-accent text-white px-2 py-1 text-[10px] font-mono font-bold border-2 border-black flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm" id="mediaIcon">videocam</span>
+<span id="mediaFpsLabel">LOOP</span>
+</div>
+</div>
+<div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 md:gap-4 mb-2">
+<h3 class="font-display text-2xl font-bold text-black" id="centerTitle">Hydraulic Transient Simulation</h3>
+</div>
+<p class="text-xs md:text-sm text-black leading-relaxed font-medium" id="centerDesc">Time-variant pressure and flow analysis across complex water distribution networks, simulating pump operations and valve control strategies.</p>
+</div>
+<div class="border-t-2 border-black pt-4 mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between font-mono text-[10px] gap-4">
+<div class="flex items-center gap-2 text-black font-bold">
+<span class="material-symbols-outlined text-sm text-accent">memory</span>
+<span id="simulationEngineTag">EPANET ENGINE</span>
+</div>
+<a class="inline-flex items-center justify-center w-full sm:w-auto gap-2 px-5 py-2.5 bg-black text-white border-2 border-black hover:bg-white hover:text-black transition-colors font-bold uppercase tracking-wider" href="#contact">
+<span>VIEW SPECIMEN</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</article>
+
+<!-- RIGHT PANEL -->
+<article class="lg:col-span-3 bg-white border-2 border-black p-4 flex flex-col justify-between shadow-hard" id="rightPanelCard">
+<div>
+<div class="flex justify-between items-center font-mono text-[10px] text-black uppercase tracking-wider pb-3 mb-3 border-b-2 border-black">
+<span class="bg-black text-white px-2 py-0.5 font-bold" id="rightBadge">PLATE // 02</span>
+<span class="font-bold" id="rightScale">24-HR EPS</span>
+</div>
+<div class="aspect-[4/3] border-2 border-black mb-4 relative group">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" id="rightPhoto" style="background-image: url('https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/WaterCad.Jpg');"></div>
+<div class="absolute bottom-2 right-2 bg-accent text-white px-2 py-1 text-[9px] font-mono font-bold border-2 border-black" id="rightOverlay">TANK: 85%</div>
+</div>
+<h3 class="font-display text-xl font-bold text-black mb-2" id="rightTitle">Extended Period Simulation</h3>
+<p class="text-xs text-black leading-relaxed font-medium" id="rightDesc">Dynamic modeling of tank draw-down and pump cycling over a 24-hour demand cycle.</p>
+</div>
+<div class="border-t-2 border-black pt-3 mt-4 flex items-center justify-between font-mono text-[10px] text-black font-bold">
+<span class="bg-black text-white px-2 py-0.5" id="rightMetric">ENERGY: 1,200 kWh</span>
+<span class="flex items-center gap-1 cursor-pointer hover:text-accent transition-colors">
+        Inspect <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</span>
+</div>
+</article>
+</div>
+
+<!-- RULERS -->
+<div class="mt-12 border-t-2 border-black pt-2 pb-1 relative select-none">
+<div class="flex justify-between text-[9px] font-mono text-black font-bold px-2 mb-1 tracking-widest">
+<span>00</span><span class="hidden sm:inline">25</span><span class="text-accent text-sm">50</span><span class="hidden sm:inline">75</span><span>100</span>
+</div>
+<div class="h-2 w-full relative ticker-ruler-ticks"></div>
+<div class="absolute top-4 left-0 w-full h-1.5 ticker-ruler-ticks-major pointer-events-none"></div>
+<div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[2px] h-2 bg-accent z-20"></div>
+</div>
+
+<!-- TICKER -->
+<div class="relative w-full overflow-hidden bg-white border-y-2 border-border-dark py-5 select-none flex items-center justify-center">
+<div class="pointer-events-none absolute inset-y-0 left-0 w-16 md:w-24 bg-gradient-to-r from-base to-transparent z-10"></div>
+<div class="pointer-events-none absolute inset-y-0 right-0 w-16 md:w-24 bg-gradient-to-l from-base to-transparent z-10"></div>
+<div class="flex items-center gap-4 md:gap-6 overflow-x-auto no-scrollbar scroll-smooth px-6 md:px-12 cursor-grab active:cursor-grabbing w-full justify-start" id="tickerTrack"></div>
+</div>
+
+<!-- BOTTOM RULER -->
+<div class="border-b-2 border-black pt-1 pb-2 relative select-none">
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-[2px] h-2 bg-accent z-20"></div>
+<div class="h-2 w-full relative ticker-ruler-ticks"></div>
+<div class="absolute top-1 left-0 w-full h-1.5 ticker-ruler-ticks-major pointer-events-none"></div>
+<div class="flex justify-between text-[9px] font-mono text-black font-bold px-2 mt-1 tracking-widest">
+<span>00</span><span class="hidden sm:inline">25</span><span class="text-accent text-sm">50</span><span class="hidden sm:inline">75</span><span>100</span>
+</div>
+</div>
+
+<!-- COUNTER (WARNA ANGKA DIPASTIKAN HITAM) -->
+<div class="mt-6 flex items-center justify-center gap-5 select-none font-mono">
+<button class="text-sm font-bold bg-black text-white px-3 py-1 border-2 border-black hover:bg-white hover:text-black transition-colors" id="counterPrevBtn" title="Previous" type="button">&lt;&lt;</button>
+<div class="flex items-center gap-2 text-xs tracking-widest bg-white border-2 border-black px-3 py-1 font-bold">
+<span class="text-[10px] uppercase text-black">INDEX</span>
+<span class="text-base font-bold" style="color: #000000 !important;" id="activeCounterVal">01</span>
+<span class="text-black/50">//</span>
+<span class="text-black">07</span>
+</div>
+<button class="text-sm font-bold bg-black text-white px-3 py-1 border-2 border-black hover:bg-white hover:text-black transition-colors" id="counterNextBtn" title="Next" type="button">&gt;&gt;</button>
+</div>
+</section>
+
+<!-- SECTION 3: CAPABILITIES -->
+<section class="py-12 md:py-20 border-b-2 border-border-dark" id="capabilities">
+<div class="mb-12">
+<span class="font-mono text-[11px] text-white bg-black px-2 py-1 tracking-widest uppercase font-bold">02 / CAPABILITIES</span>
+<h2 class="font-display text-3xl md:text-6xl font-bold text-black mt-4 mb-4">
+          Interdisciplinary Spatial Practice
+        </h2>
+<p class="text-base text-black max-w-2xl font-medium">
+          Operating at the confluence of urban science, computational spatial mechanics, and fine publication design to transform abstract territorial data into tangible insight.
+        </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border-t-2 border-l-2 border-black bg-white">
+<!-- Col 1 -->
+<div class="p-6 md:p-8 border-r-2 border-b-2 border-black flex flex-col justify-between hover:bg-base transition-colors group">
+<div>
+<div class="font-mono text-[10px] text-black mb-6 font-bold tracking-widest">CAPABILITY // 01</div>
+<div class="size-10 border-2 border-black bg-white flex items-center justify-center mb-6 text-black group-hover:bg-accent group-hover:text-white transition-colors shadow-hard">
+<span class="material-symbols-outlined text-2xl">public</span>
+</div>
+<h3 class="font-display text-2xl font-bold text-black mb-3">Spatial Thinking</h3>
+<p class="text-sm text-black font-medium leading-relaxed mb-6">GIS modeling, spatial autocorrelation, geostatistics, raster/vector synthesis, and territorial zoning frameworks.</p>
+</div>
+<ul class="font-mono text-[10px] text-black font-bold space-y-2 border-t-2 border-black pt-4">
+<li class="flex items-center gap-2"><span class="size-1.5 bg-black"></span><span>Anselin Local Moran's I</span></li>
+<li class="flex items-center gap-2"><span class="size-1.5 bg-black"></span><span>Kriging <span class="amp">&amp;</span> IDW Interpolation</span></li>
+<li class="flex items-center gap-2"><span class="size-1.5 bg-black"></span><span>Raster Map Algebra</span></li>
+</ul>
+</div>
+<!-- Col 2 -->
+<div class="p-6 md:p-8 border-r-2 border-b-2 border-black flex flex-col justify-between hover:bg-base transition-colors group">
+<div>
+<div class="font-mono text-[10px] text-black mb-6 font-bold tracking-widest">CAPABILITY // 02</div>
+<div class="size-10 border-2 border-black bg-white flex items-center justify-center mb-6 text-black group-hover:bg-accent group-hover:text-white transition-colors shadow-hard">
+<span class="material-symbols-outlined text-2xl">analytics</span>
+</div>
+<h3 class="font-display text-2xl font-bold text-black mb-3">Urban Research</h3>
+<p class="text-sm text-black font-medium leading-relaxed mb-6">Quantitative demographics, field surveys, transit accessibility matrices, and evidence-based policy whitepapers.</p>
+</div>
+<ul class="font-mono text-[10px] text-black font-bold space-y-2 border-t-2 border-black pt-4">
+<li class="flex items-center gap-2"><span class="size-1.5 bg-black"></span><span>Micro-Census Aggregations</span></li>
+<li class="flex items-center gap-2"><span class="size-1.5 bg-black"></span><span>Catchment Isochrone Profiling</span></li>
+<li class="flex items-center gap-2"><span class="size-1.5 bg-black"></span><span>Spatial Econometrics</span></li>
+</ul>
+</div>
+<!-- Col 3 -->
+<div class="p-6 md:p-8 border-r-2 border-b-2 border-black flex flex-col justify-between hover:bg-base transition-colors group">
+<div>
+<div class="font-mono text-[10px] text-black mb-6 font-bold tracking-widest">CAPABILITY // 03</div>
+<div class="size-10 border-2 border-black bg-white flex items-center justify-center mb-6 text-black group-hover:bg-accent group-hover:text-white transition-colors shadow-hard">
+<span class="material-symbols-outlined text-2xl">architecture</span>
+</div>
+<h3 class="font-display text-2xl font-bold text-black mb-3">Urban Design</h3>
+<p class="text-sm text-black font-medium leading-relaxed mb-6">Public space typologies, pedestrian circulation, universal accessibility guidelines, and streetscape masterplans.</p>
+</div>
+<ul class="font-mono text-[10px] text-black font-bold space-y-2 border-t-2 border-black pt-4">
+<li class="flex items-center gap-2"><span class="size-1.5 bg-black"></span><span>Pedestrian Comfort Audits</span></li>
+<li class="flex items-center gap-2"><span class="size-1.5 bg-black"></span><span>Active Frontage Mapping</span></li>
+<li class="flex items-center gap-2"><span class="size-1.5 bg-black"></span><span>Tactical Street Typologies</span></li>
+</ul>
+</div>
+<!-- Col 4 -->
+<div class="p-6 md:p-8 border-r-2 border-b-2 border-black flex flex-col justify-between hover:bg-base transition-colors group">
+<div>
+<div class="font-mono text-[10px] text-black mb-6 font-bold tracking-widest">CAPABILITY // 04</div>
+<div class="size-10 border-2 border-black bg-white flex items-center justify-center mb-6 text-black group-hover:bg-accent group-hover:text-white transition-colors shadow-hard">
+<span class="material-symbols-outlined text-2xl">map</span>
+</div>
+<h3 class="font-display text-2xl font-bold text-black mb-3">Visual Communication</h3>
+<p class="text-sm text-black font-medium leading-relaxed mb-6">Cartographic storytelling, editorial publication layouts, dynamic data visualizations, and executive diagrams.</p>
+</div>
+<ul class="font-mono text-[10px] text-black font-bold space-y-2 border-t-2 border-black pt-4">
+<li class="flex items-center gap-2"><span class="size-1.5 bg-black"></span><span>Custom Cartographic Styling</span></li>
+<li class="flex items-center gap-2"><span class="size-1.5 bg-black"></span><span>Editorial Book Typography</span></li>
+<li class="flex items-center gap-2"><span class="size-1.5 bg-black"></span><span>Executive Policy Dashboards</span></li>
+</ul>
+</div>
+</div>
+</section>
+
+<!-- SECTION 4: METHODOLOGY -->
+<section class="py-12 md:py-20 border-b-2 border-border-dark" id="methodology">
+<div class="mb-14">
+<span class="font-mono text-[11px] text-white bg-black px-2 py-1 tracking-widest uppercase font-bold">03 / METHODOLOGY</span>
+<h2 class="font-display text-3xl md:text-6xl font-bold text-black mt-4 mb-3">
+          The 3-Step Framework
+        </h2>
+<p class="text-base text-black max-w-2xl font-medium">
+          A systematic operational trajectory ensuring analytical rigor remains directly tied to real-world civic impact and clear stakeholder decisions.
+        </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-white border-2 border-black p-6 md:p-8 relative flex flex-col justify-between shadow-hard">
+<div>
+<div class="flex justify-between items-center mb-8 pb-3 border-b-2 border-black">
+<span class="font-mono text-3xl font-black text-black">01.</span>
+<span class="font-mono text-[10px] uppercase px-2 py-0.5 bg-black text-white font-bold">Phase One</span>
+</div>
+<h3 class="font-display text-3xl font-bold text-black mb-4 tracking-wide">OBSERVE</h3>
+<p class="text-sm text-black font-medium leading-relaxed mb-6">Ground truth collection, sensory field observation, high-resolution drone reconnaissance, and participatory urban mapping sessions with community representatives.</p>
+</div>
+<div class="border-t-2 border-black pt-4 text-[10px] font-mono text-accent font-bold">
+            OUTPUT: Raw GeoTIFFs, Interview Matrices, Unprocessed Point Clouds
+          </div>
+</div>
+<div class="bg-white border-2 border-black p-6 md:p-8 relative flex flex-col justify-between shadow-hard">
+<div>
+<div class="flex justify-between items-center mb-8 pb-3 border-b-2 border-black">
+<span class="font-mono text-3xl font-black text-black">02.</span>
+<span class="font-mono text-[10px] uppercase px-2 py-0.5 bg-black text-white font-bold">Phase Two</span>
+</div>
+<h3 class="font-display text-3xl font-bold text-black mb-4 tracking-wide">ANALYZE</h3>
+<p class="text-sm text-black font-medium leading-relaxed mb-6">Spatial multi-criteria analysis (MCA), network flow density simulations, topological error correction, and cross-variable correlation models.</p>
+</div>
+<div class="border-t-2 border-black pt-4 text-[10px] font-mono text-accent font-bold">
+            OUTPUT: Isochrone Models, Cost-Distance Rasters, Sensitivity Indices
+          </div>
+</div>
+<div class="bg-white border-2 border-black p-6 md:p-8 relative flex flex-col justify-between shadow-hard">
+<div>
+<div class="flex justify-between items-center mb-8 pb-3 border-b-2 border-black">
+<span class="font-mono text-3xl font-black text-black">03.</span>
+<span class="font-mono text-[10px] uppercase px-2 py-0.5 bg-black text-white font-bold">Phase Three</span>
+</div>
+<h3 class="font-display text-3xl font-bold text-black mb-4 tracking-wide">SYNTHESIZE</h3>
+<p class="text-sm text-black font-medium leading-relaxed mb-6">High-fidelity masterplan synthesis, actionable spatial policy documentation, interactive dashboard publication, and executive stakeholder translation.</p>
+</div>
+<div class="border-t-2 border-black pt-4 text-[10px] font-mono text-accent font-bold">
+            OUTPUT: Publication Atlases, WebGIS Portals, Statutory Policy Briefs
+          </div>
+</div>
+</div>
+</section>
+
+<!-- SECTION 5: ABOUT, JOURNAL, & CONTACT -->
+<section class="py-12 md:py-20">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-12 items-start">
+    
+    <!-- KOLOM KIRI (PROFIL & JURNAL) -->
+    <div class="lg:col-span-7 flex flex-col gap-12 md:gap-16">
+      <!-- Profil -->
+      <div class="border-b-2 border-black pb-8 md:pb-12">
+        <span class="font-mono text-[11px] text-white bg-black px-2 py-1 tracking-widest uppercase font-bold">PRACTITIONER PROFILE</span>
+        <h2 class="font-display text-4xl md:text-5xl font-black text-black mt-4 mb-4 md:mb-6" style="color: #000000 !important;">Holik Al-Farij</h2>
+        
+        <div class="space-y-4 text-sm md:text-base leading-relaxed font-medium">
+          <p style="color: #000000 !important;">As an emerging urban planning practitioner, my work is grounded in academic rigor. I have authored a comprehensive undergraduate thesis and published research in academic journals, focusing on spatial dynamics and urban transformation.</p>
+          <p style="color: #000000 !important;">I treat maps and spatial data not merely as descriptive illustrations, but as active analytical instruments. By combining my research background with GIS and clear visual communication, I translate complex, data-driven urban challenges into meaningful planning insights.</p>
+        </div>
+        
+        <div class="mt-8 flex flex-wrap gap-2 md:gap-3 font-mono text-[10px] text-black font-bold uppercase">
+          <div class="px-3 py-1.5 border-2 border-black bg-white">B.Eng Urban <span class="amp">&amp;</span> Regional Planning</div>
+          <div class="px-3 py-1.5 border-2 border-black bg-white">Published Journal Author</div>
+          <div class="px-3 py-1.5 border-2 border-black bg-white">Thesis Researcher</div>
+        </div>
+      </div>
+
+      <!-- Jurnal -->
+      <div id="journal">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 pb-3 border-b-2 border-black gap-2">
+          <div>
+            <span class="font-mono text-[11px] text-white bg-black px-2 py-1 tracking-widest uppercase font-bold">04 / DISPATCHES</span>
+            <h3 class="font-display text-3xl font-bold text-black mt-3">Spatial Research & Journal</h3>
+          </div>
+          <a class="font-mono text-[10px] text-black font-bold border-2 border-black px-3 py-1 hover:bg-black hover:text-white transition-colors" href="#">VIEW ALL →</a>
+        </div>
+        
+        <div class="space-y-4">
+          <!-- Jurnal Utama -->
+          <article class="p-5 border-2 border-black bg-white hover:bg-base transition-all group cursor-pointer shadow-hard">
+            <div class="flex justify-between items-center text-[10px] font-mono text-black font-bold uppercase mb-3 border-b border-border-light pb-2">
+              <span>Published Journal · 2025</span>
+              <span class="group-hover:translate-x-1 transition-transform text-accent">→</span>
+            </div>
+            <h4 class="font-display text-xl font-bold text-black group-hover:text-accent transition-colors mb-2">[Judul Artikel Jurnal Kamu Disini]</h4>
+            <p class="text-xs text-black font-medium line-clamp-2 leading-relaxed">A published academic paper analyzing spatial data, urban morphology, or planning policies using GIS methodologies. Ganti teks ini dengan abstrak singkat dari jurnalmu.</p>
+          </article>
+          
+          <!-- Skripsi -->
+          <article class="p-5 border-2 border-black bg-white hover:bg-base transition-all group cursor-pointer shadow-hard">
+            <div class="flex justify-between items-center text-[10px] font-mono text-black font-bold uppercase mb-3 border-b border-border-light pb-2">
+              <span>Undergraduate Thesis · 2024</span>
+              <span class="group-hover:translate-x-1 transition-transform text-accent">→</span>
+            </div>
+            <h4 class="font-display text-xl font-bold text-black group-hover:text-accent transition-colors mb-2">[Judul Skripsi Kamu Disini]</h4>
+            <p class="text-xs text-black font-medium line-clamp-2 leading-relaxed">Comprehensive spatial research thesis investigating regional development, land use suitability, or infrastructure modeling. Ganti teks ini dengan ringkasan skripsimu.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- KOLOM KANAN (KONTAK) -->
+    <div class="lg:col-span-5" id="contact">
+      <div class="bg-white border-2 border-black p-6 md:p-8 shadow-hard">
+        <span class="font-mono text-[11px] text-white bg-black px-2 py-1 tracking-widest uppercase font-bold inline-block mb-4">05 / INQUIRY</span>
+        <h3 class="font-display text-3xl font-bold text-black mt-1 mb-3" style="color: #000000 !important;">Initiate Collaboration</h3>
+        <p class="text-sm text-black mb-8 leading-relaxed font-medium" style="color: #000000 !important;">Available for territorial research, spatial analysis, cartographic design, and planning consultancies.</p>
+
+        <div class="pt-6 border-t-2 border-black">
+          <span class="block font-mono text-[10px] uppercase mb-5 tracking-wider font-bold text-black" style="color: #000000 !important;">Direct Coordinates:</span>
+          <div class="flex flex-col gap-4 font-mono text-sm font-bold">
+            <!-- LINKEDIN -->
+            <a class="hover:text-accent transition-colors flex items-center gap-3 group border-2 border-black p-3 bg-white hover:bg-base" href="https://www.linkedin.com/in/holik-al-farij-62051a381/" rel="noopener" target="_blank">
+              <span class="material-symbols-outlined text-xl text-accent">link</span>
+              <span style="color: #000000 !important;">LinkedIn: in/holik-al-farij</span>
+            </a>
+            <!-- EMAIL -->
+            <a class="hover:text-accent transition-colors flex items-center gap-3 group border-2 border-black p-3 bg-white hover:bg-base" href="mailto:contact@holik-spatial.archive">
+              <span class="material-symbols-outlined text-xl text-accent">mail</span>
+              <span style="color: #000000 !important;">contact@holik-spatial.archive</span>
+            </a>
+            <!-- INSTAGRAM -->
+            <a class="hover:text-accent transition-colors flex items-center gap-3 group border-2 border-black p-3 bg-white hover:bg-base" href="https://instagram.com/holik.spatial" rel="noopener" target="_blank">
+              <span class="material-symbols-outlined text-xl text-accent">alternate_email</span>
+              <span style="color: #000000 !important;">Instagram: @holik.spatial</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+</main>
+
+<!-- FOOTER -->
+<footer class="border-t-2 border-border-dark bg-black text-white py-8 select-none relative z-10 mt-12">
+<div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-6 font-mono uppercase tracking-widest text-[10px] font-bold text-center md:text-left">
+<div>© 2026 LAST UPDATE: FEB 2026</div>
+<div class="flex items-center gap-2 text-accent">
+<span class="w-2 h-2 bg-accent inline-block"></span>
+      HOLIK AL-FARIJ // SPATIAL ARCHIVE
+    </div>
+<div class="flex items-center gap-4">
+<a class="hover:text-accent transition-colors underline underline-offset-4" href="#">DESIGN BY BL/S®</a>
+<span class="text-white/30">//</span>
+<a class="hover:text-accent transition-colors underline underline-offset-4" href="#">ART BY HOLIK</a>
+</div>
+</div>
+</footer>
+
+<!-- JAVASCRIPT LOGIC -->
+<script>
+    // LOGIKA UTAMA (CLOCK & TICKER)
+    function updateWIBClock() {
+      const clockEl = document.getElementById('live-clock');
+      if (!clockEl) return;
+      const now = new Date();
+      const options = { timeZone: 'Asia/Jakarta', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+      const timeStr = new Intl.DateTimeFormat('id-ID', options).format(now).replace(/\./g, ':');
+      clockEl.textContent = `${timeStr} WIB`;
+    }
+    setInterval(updateWIBClock, 1000);
+    updateWIBClock();
+
+    const softwareList = [
+      { id: 'EPANET', label: 'EPANET', sub: 'Water Distribution', num: '01' },
+      { id: 'WATERCAD', label: 'WATERCAD', sub: 'Hydraulic Simulation', num: '02' },
+      { id: 'QGIS', label: 'QGIS', sub: 'Spatial Analysis', num: '03' },
+      { id: 'ARCGIS', label: 'ARCGIS', sub: 'Enterprise GIS', num: '04' },
+      { id: 'HECRAS', label: 'HEC-RAS', sub: 'River Hydraulics', num: '05' },
+      { id: 'OPENLCA', label: 'OPENLCA', sub: 'Life Cycle Assessment', num: '06' },
+      { id: 'TABLEAU', label: 'TABLEAU', sub: 'Demographics & Metrics', num: '07' }
+    ];
+
+    const softwareArchive = {
+      'EPANET': {
+        name: 'EPANET', badge: 'EPANET v2.2', subText: 'Water Distribution Modeling',
+        title: 'Water Distribution Network Simulation',
+        narrative: 'Hydraulic and water quality simulation of pressurized pipe networks. Integrates demand-driven analysis, extended period simulation, and water quality tracing for municipal water supply systems.',
+        specTag: 'HYDRAULIC NETWORK // WATER QUALITY',
+        media: { type: 'video', src: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/Video%20Epanet.mp4', title: 'Hydraulic Transient Simulation', desc: 'Time-variant pressure and flow analysis across complex water distribution networks, simulating pump operations and valve control strategies.', tag: 'WATER DISTRIBUTION MODEL', engine: 'EPANET CALCULATION ENGINE', res: '60 FPS // LIVE SIMULATION' },
+        leftPhoto: { url: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/WaterCad.Jpg', badge: 'PLATE // 01', scale: 'NODE: 1,240 JUNCTIONS', overlay: 'PRESSURE: 45 PSI', title: 'Network Topology & Demand Nodes', desc: 'Spatial distribution of demand nodes, pipe segments, and hydraulic junctions across the service area.', metric: 'FLOW: 320 L/S' },
+        rightPhoto: { url: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/WaterCad.Jpg', badge: 'PLATE // 02', scale: 'SIMULATION: 24-HR EPS', overlay: 'TANK LEVEL: 85%', title: 'Extended Period Simulation', desc: 'Dynamic modeling of tank draw-down and pump cycling over a 24-hour demand cycle.', metric: 'ENERGY: 1,200 kWh' }
+      },
+      'WATERCAD': {
+        name: 'WATERCAD', badge: 'WATERCAD v10 CONNECT', subText: 'Hydraulic Simulation',
+        title: 'Pipe Flow Dynamics & Head Pressure Simulation',
+        narrative: 'Extended Period Simulation (EPS) modeling for municipal water distribution. Synthesizes peak hydraulic pressure surges, pump lifecycle operations, and residual chlorine dissipation across 14 district zones.',
+        specTag: 'FLOW GRADIENT // EPS NETWORK MODEL',
+        media: { type: 'image', src: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/WaterCad.Jpg', title: 'Extended Period Hydraulic Transient Vector', desc: 'Time-variant network simulation synthesizing multi-reservoir pump scheduling, head loss dissipation, and dynamic boundary valve throttling under extreme urban demand load conditions.', tag: 'DYNAMIC FLUID DYNAMICS MODEL', engine: 'BENTLEY CALIBRATED KERNEL', res: 'STATIC IMAGE // HIGH-RES' },
+        leftPhoto: { url: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/WaterCad.Jpg', badge: 'PLATE // 01', scale: 'SCALE 1:25,000', overlay: 'HEAD LOSS: 0.12 m/km', title: 'EPS Hydraulic Network Map', desc: 'Isoline pressure gradients, topological junction telemetry, and nodal hydraulic friction indexes across primary distribution grids.', metric: 'ISOLINE: 0.5 BAR' },
+        rightPhoto: { url: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/WaterCad.Jpg', badge: 'PLATE // 02', scale: 'STRESS: VERIFIED', overlay: 'JUNCTION: PASSED', title: 'Reservoir Dynamics & Fire Flow', desc: 'High-load emergency fire hydrant discharge calculations coupled with cyclical tank draw-down and level replenishment curves.', metric: 'STORAGE: 4,500 m³' }
+      },
+      'QGIS': {
+        name: 'QGIS', badge: 'QGIS 3.34 LTR + GRASS', subText: 'Spatial Analysis & GIS',
+        title: 'Bandung Metro Road Network & Accessibility Analysis',
+        narrative: 'Graph-theoretical topological road network calculation combined with socio-demographic census strata. Unveils multi-modal spatial disparities, walking threshold catchment zones, and public transit desert clusters.',
+        specTag: 'NETWORK ISOCHRONE // LOCAL MORAN I',
+        media: { type: 'video', src: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/QGIS%20Video.mp4', title: 'Metropolitan Spatial Connectivity & Raster Overlay', desc: 'Live multi-layer spatial scanning combining raster cost-distance computations, dynamic friction surfaces, and vector accessibility gradients across regional topographic nodes.', tag: 'RASTER MAP ALGEBRA SCANNER', engine: 'GDAL/OGR & PYQGIS KERNEL', res: '60 FPS // GIS VECTOR' },
+        leftPhoto: { url: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/Qgis.png', badge: 'PLATE // 01', scale: 'ISO: 5-10-15 MIN', overlay: 'COVERAGE: 84.6% URBAN', title: 'Transit Isochrone Service Areas', desc: 'Walking threshold catchment zones and multi-modal transfer hub buffers synthesized through Dijkstra shortest-path calculations.', metric: 'COMMUTE: <15 MIN' },
+        rightPhoto: { url: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/Qgis.png', badge: 'PLATE // 02', scale: 'SPATIAL STATS P<0.01', overlay: 'HIGH-HIGH CLUSTERS: 18.2%', title: 'Spatial Autocorrelation (Moran\'s I)', desc: 'Anselin Local Moran\'s I statistical significance clustering revealing persistent urban transit cold spots and vulnerable mobility corridors.', metric: 'Z-SCORE: +3.42' }
+      },
+      'ARCGIS': {
+        name: 'ARCGIS', badge: 'ESRI ARCGIS PRO v3.x', subText: 'Enterprise GIS & Mapping',
+        title: 'Geographic Database Management & Web Mapping',
+        narrative: 'Enterprise-level geodatabase management, web mapping, and advanced spatial analytics. Integrates multi-source spatial datasets to streamline municipal asset inventory, urban growth modeling, and land-use suitability analysis.',
+        specTag: 'GEODATABASE // SPATIAL ANALYST',
+        media: { type: 'video', src: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/Video%20Argis.mp4', title: 'Enterprise Geospatial Data Infrastructure', desc: 'Automated spatial queries, relational database topology checks, and live WebGIS feature service publication for inter-departmental municipal planning.', tag: 'GEODATABASE TOPOLOGY ENGINE', engine: 'ARCGIS PRO 64-BIT PROCESSING', res: '60 FPS // ENTERPRISE CLOUD' },
+        leftPhoto: { url: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/Arcgis.png', badge: 'PLATE // 01', scale: 'DB: 12,000+ POLYGONS', overlay: 'TOPOLOGY: CLEAN', title: 'Municipal Land Parcel Database', desc: 'Comprehensive cadastral mapping with relational attribute tables, zoning overlays, and land ownership vectors.', metric: 'ASSETS: 45,210 POINTS' },
+        rightPhoto: { url: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/Arcgis.png', badge: 'PLATE // 02', scale: 'CLOUD: SYNCED', overlay: 'SUITABILITY: HIGH', title: 'Land-Use Suitability Analysis', desc: 'Multi-criteria evaluation (MCE) combining slope, proximity, and demographic layers to identify optimal development zones.', metric: 'WEIGHTED SCORE: 8.5/10' }
+      },
+      'HECRAS': {
+        name: 'HEC-RAS', badge: 'HEC-RAS v6.4', subText: 'River Hydraulics & Floodplain',
+        title: 'River Hydraulics Modeling & Floodplain Mapping',
+        narrative: 'One-dimensional and two-dimensional unsteady flow simulation for river systems. Integrates cross-section geometry, bridge hydraulics, and flood inundation mapping to assess urban flood risk and infrastructure resilience.',
+        specTag: 'FLOODPLAIN MAPPING // UNSTEADY FLOW',
+        media: { type: 'video', src: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/Video%20Hec-ras.mp4', title: '2D Flood Inundation Simulation', desc: 'Dynamic water surface elevation modeling across complex urban topography, simulating flood wave propagation and identifying critical vulnerability zones.', tag: 'HYDRAULIC FLOW PROPAGATION', engine: 'US ARMY CORPS OF ENGINEERS SOLVER', res: '60 FPS // 2D MESH' },
+        leftPhoto: { url: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/Hec-Ras.png', badge: 'PLATE // 01', scale: 'CROSS-SECTION: 500M', overlay: 'FLOW RATE: 1200 m³/s', title: 'River Cross-Section Geometry', desc: 'Terrain extraction and channel capacity analysis for peak discharge scenarios.', metric: 'BANK FULL: 4.2 M' },
+        rightPhoto: { url: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/Hec-Ras.png', badge: 'PLATE // 02', scale: 'INUNDATION: 50-YR EVENT', overlay: 'AREA AT RISK: 12.4 km²', title: 'Flood Inundation Depth Map', desc: 'Spatial distribution of water depth and velocity vectors during extreme rainfall events.', metric: 'DEPTH: 1.8 M MAX' }
+      },
+      'OPENLCA': {
+        name: 'OPENLCA', badge: 'OPENLCA v2.0', subText: 'Life Cycle Assessment',
+        title: 'Life Cycle Assessment (LCA) & Regional Carbon Footprint',
+        narrative: 'Comprehensive environmental impact assessment quantifying carbon footprint, material flows, and energy consumption. Utilizes Ecoinvent databases to evaluate the sustainability of urban infrastructure and construction materials.',
+        specTag: 'CARBON FOOTPRINT // MATERIAL FLOW',
+        media: { type: 'image', src: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/OpenLca.jpg', title: 'Environmental Impact Flow Analysis', desc: 'Visualizing global warming potential (GWP) and resource depletion across the entire life cycle of urban development projects.', tag: 'LCA IMPACT ASSESSMENT', engine: 'OPENLCA CALCULATION ENGINE', res: 'STATIC IMAGE // HIGH-RES' },
+        leftPhoto: { url: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/OpenLca.jpg', badge: 'PLATE // 01', scale: 'SYSTEM BOUNDARY: CRADLE-TO-GATE', overlay: 'GWP: 450 kg CO2-eq', title: 'Material Life Cycle Inventory', desc: 'Extraction, processing, and transportation impacts of primary construction materials.', metric: 'ENERGY: 1.2 MJ' },
+        rightPhoto: { url: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/OpenLca.jpg', badge: 'PLATE // 02', scale: 'GWP SCENARIO: BASELINE', overlay: 'REDUCTION TARGET: -30%', title: 'Carbon Footprint Dashboard', desc: 'Comparative analysis of embodied carbon across different structural systems and urban layouts.', metric: 'ECO-INDICATOR: 85 Pt' }
+      },
+      'TABLEAU': {
+        name: 'TABLEAU', badge: 'TABLEAU DESKTOP // SERVER', subText: 'Demographics & Metrics',
+        title: 'Demographic Visualization & Public Mobility Metrics',
+        narrative: 'Interactive spatial business intelligence dashboards correlating micro-census aggregations with real-time transit telemetry to guide high-impact public investments.',
+        specTag: 'TELEMETRY BI // MULTI-MODAL MATRIX',
+        media: { type: 'video', src: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/Video%20Tableu.mp4', title: 'Dynamic Demographic Stream & KPI Dashboard Telemetry', desc: 'Continuous real-time commuter throughput streams, demographic dependency ratios, and live route occupancy load matrices.', tag: 'REAL-TIME DATA STREAM PIPELINE', engine: 'HYPER IN-MEMORY ENGINE', res: '60 FPS // LIVE TELEMETRY' },
+        leftPhoto: { url: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/Tableu.jpg', badge: 'PLATE // 01', scale: 'N = 2,450,000 RESIDENTS', overlay: 'CONFIDENCE: 99%', title: 'Catchment Demographic Profiling', desc: 'Socio-economic quintile indexing crossed with distance-to-transit vectors to measure equitable infrastructure distribution.', metric: 'MODAL SPLIT: 62% MOTOR' },
+        rightPhoto: { url: 'https://raw.githubusercontent.com/1nmoka/Aset-Portofolio/main/Tableu.jpg', badge: 'PLATE // 02', scale: 'FREQUENCY: 15-MIN REFRESH', overlay: 'PEAK LOAD: 14,200 PAX/HR', title: 'Transit KPI Ridership Matrix', desc: 'High-frequency corridor load tracking, route reliability metrics, and bottleneck dwell times mapped onto spatial origin-destination lines.', metric: 'PUNCTUALITY: 91.8%' }
+      }
+    };
+
+    const showcaseStage = document.getElementById('showcaseStage');
+    const activeSoftwareBadge = document.getElementById('activeSoftwareBadge');
+    const activeShowcaseTitle = document.getElementById('activeShowcaseTitle');
+    const activeNarrative = document.getElementById('activeNarrative');
+    const activeSpecTag = document.getElementById('activeSpecTag');
+    const activeCounterVal = document.getElementById('activeCounterVal');
+
+    const leftBadge = document.getElementById('leftBadge');
+    const leftScale = document.getElementById('leftScale');
+    const leftPhoto = document.getElementById('leftPhoto');
+    const leftOverlay = document.getElementById('leftOverlay');
+    const leftTitle = document.getElementById('leftTitle');
+    const leftDesc = document.getElementById('leftDesc');
+    const leftMetric = document.getElementById('leftMetric');
+
+    const primaryVideo = document.getElementById('primaryVideo');
+    const primaryVideoSrc = document.getElementById('primaryVideoSrc');
+    const primaryImage = document.getElementById('primaryImage');
+    
+    const mediaTypeBadge = document.getElementById('mediaTypeBadge');
+    const mediaTelemetryTag = document.getElementById('mediaTelemetryTag');
+    const mediaResolution = document.getElementById('mediaResolution');
+    const mediaIcon = document.getElementById('mediaIcon');
+    const mediaFpsLabel = document.getElementById('mediaFpsLabel');
+    
+    const centerTitle = document.getElementById('centerTitle');
+    const centerSubSoftware = document.getElementById('centerSubSoftware');
+    const centerDesc = document.getElementById('centerDesc');
+    const simulationEngineTag = document.getElementById('simulationEngineTag');
+
+    const rightBadge = document.getElementById('rightBadge');
+    const rightScale = document.getElementById('rightScale');
+    const rightPhoto = document.getElementById('rightPhoto');
+    const rightOverlay = document.getElementById('rightOverlay');
+    const rightTitle = document.getElementById('rightTitle');
+    const rightDesc = document.getElementById('rightDesc');
+    const rightMetric = document.getElementById('rightMetric');
+
+    const tickerTrack = document.getElementById('tickerTrack');
+    const counterPrevBtn = document.getElementById('counterPrevBtn');
+    const counterNextBtn = document.getElementById('counterNextBtn');
+
+    const repeatCount = 3;
+    let allPills = [];
+    tickerTrack.innerHTML = '';
+
+    for (let setIndex = 0; setIndex < repeatCount; setIndex++) {
+      softwareList.forEach((item, itemIdx) => {
+        const pill = document.createElement('button');
+        pill.type = 'button';
+        pill.setAttribute('data-filter', item.id);
+        pill.setAttribute('data-index', itemIdx);
+        pill.setAttribute('data-set', setIndex);
+        pill.className = 'ticker-pill flex-shrink-0 px-3 md:px-4 py-2 border-2 border-black bg-white text-black font-mono text-[10px] md:text-xs cursor-pointer transition-all duration-200 hover:bg-base flex items-center gap-2 shadow-hard';
+        pill.innerHTML = `<span class="font-bold tracking-wide">${item.label}</span><span class="text-[8px] md:text-[9px] text-black/60 font-semibold">(${item.sub})</span>`;
+        tickerTrack.appendChild(pill);
+        allPills.push(pill);
+      });
+    }
+
+    let isResetting = false;
+    let singleSetWidth = 0;
+    let currentSoftwareKey = 'EPANET';
+    let currentSoftwareIndex = 0;
+
+    function calculateSetWidth() {
+      if (allPills.length === 0) return 0;
+      const count = softwareList.length;
+      const firstItem = allPills[0];
+      const nextSetFirstItem = allPills[count];
+      return nextSetFirstItem.offsetLeft - firstItem.offsetLeft;
+    }
+
+    function updateShowcase(softwareKey) {
+      const data = softwareArchive[softwareKey];
+      if (!data) return;
+      currentSoftwareKey = softwareKey;
+
+      const foundIdx = softwareList.findIndex(s => s.id === softwareKey);
+      if (foundIdx !== -1) {
+        currentSoftwareIndex = foundIdx;
+        if (activeCounterVal) activeCounterVal.textContent = softwareList[foundIdx].num;
+      }
+
+      showcaseStage.classList.add('opacity-0', 'scale-[0.99]');
+
+      setTimeout(() => {
+        if (activeSoftwareBadge) activeSoftwareBadge.textContent = data.badge;
+        if (activeShowcaseTitle) activeShowcaseTitle.innerHTML = data.title;
+        if (activeNarrative) activeNarrative.textContent = data.narrative;
+        if (activeSpecTag) activeSpecTag.innerHTML = data.specTag;
+
+        if (leftBadge) leftBadge.textContent = data.leftPhoto.badge;
+        if (leftScale) leftScale.textContent = data.leftPhoto.scale;
+        if (leftPhoto) leftPhoto.style.backgroundImage = `url('${data.leftPhoto.url}')`;
+        if (leftOverlay) leftOverlay.textContent = data.leftPhoto.overlay;
+        if (leftTitle) leftTitle.innerHTML = data.leftPhoto.title;
+        if (leftDesc) leftDesc.textContent = data.leftPhoto.desc;
+        if (leftMetric) leftMetric.textContent = data.leftPhoto.metric;
+
+        if (data.media.type === 'video') {
+          primaryVideo.classList.remove('hidden');
+          primaryImage.classList.add('hidden');
+          
+          primaryVideoSrc.src = data.media.src;
+          primaryVideo.load();
+          primaryVideo.play().catch(() => {});
+          
+          if (mediaTypeBadge) mediaTypeBadge.textContent = '● LIVE SIMULATION';
+          if (mediaIcon) mediaIcon.textContent = 'videocam';
+          if (mediaFpsLabel) mediaFpsLabel.textContent = 'LOOP';
+        } else {
+          primaryVideo.classList.add('hidden');
+          primaryVideo.pause();
+          primaryImage.classList.remove('hidden');
+          
+          primaryImage.src = data.media.src;
+          
+          if (mediaTypeBadge) mediaTypeBadge.textContent = '● LIVE PREVIEW';
+          if (mediaIcon) mediaIcon.textContent = 'image';
+          if (mediaFpsLabel) mediaFpsLabel.textContent = 'STATIC';
+        }
+
+        if (mediaTelemetryTag) mediaTelemetryTag.textContent = data.media.tag;
+        if (mediaResolution) mediaResolution.textContent = data.media.res;
+        if (centerTitle) centerTitle.innerHTML = data.media.title;
+        if (centerSubSoftware) centerSubSoftware.textContent = data.badge;
+        if (centerDesc) centerDesc.textContent = data.media.desc;
+        if (simulationEngineTag) simulationEngineTag.innerHTML = data.media.engine;
+
+        if (rightBadge) rightBadge.textContent = data.rightPhoto.badge;
+        if (rightScale) rightScale.textContent = data.rightPhoto.scale;
+        if (rightPhoto) rightPhoto.style.backgroundImage = `url('${data.rightPhoto.url}')`;
+        if (rightOverlay) rightOverlay.textContent = data.rightPhoto.overlay;
+        if (rightTitle) rightTitle.innerHTML = data.rightPhoto.title;
+        if (rightDesc) rightDesc.textContent = data.rightPhoto.desc;
+        if (rightMetric) rightMetric.textContent = data.rightPhoto.metric;
+
+        showcaseStage.classList.remove('opacity-0', 'scale-[0.99]');
+      }, 250);
+    }
+
+    function updateCenterActivePill() {
+      if (isResetting) return;
+      const trackRect = tickerTrack.getBoundingClientRect();
+      const trackCenter = trackRect.left + trackRect.width / 2;
+      let closestPill = null;
+      let minDistance = Infinity;
+
+      allPills.forEach(pill => {
+        const pillRect = pill.getBoundingClientRect();
+        const pillCenter = pillRect.left + pillRect.width / 2;
+        const distance = Math.abs(trackCenter - pillCenter);
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestPill = pill;
+        }
+      });
+
+      if (closestPill) {
+        allPills.forEach(p => {
+          if (p === closestPill) {
+            p.className = 'ticker-pill flex-shrink-0 px-3 md:px-4 py-2 border-2 border-black bg-black text-white font-mono text-[10px] md:text-xs cursor-pointer transition-all duration-200 scale-110 z-20 shadow-[4px_4px_0_#FF3300] flex items-center gap-2';
+            const subSpan = p.querySelector('span:last-child');
+            if (subSpan) subSpan.className = 'text-[8px] md:text-[9px] text-white/70 font-semibold';
+          } else {
+            p.className = 'ticker-pill flex-shrink-0 px-3 md:px-4 py-2 border-2 border-black bg-white text-black font-mono text-[10px] md:text-xs cursor-pointer transition-all duration-200 shadow-hard flex items-center gap-2';
+            const subSpan = p.querySelector('span:last-child');
+            if (subSpan) subSpan.className = 'text-[8px] md:text-[9px] text-black/60 font-semibold';
+          }
+        });
+
+        const filter = closestPill.getAttribute('data-filter');
+        if (filter && filter !== currentSoftwareKey) {
+          updateShowcase(filter);
+        }
+      }
+    }
+
+    function scrollPillToCenter(element, smooth = true) {
+      const trackCenter = tickerTrack.clientWidth / 2;
+      const pillCenter = element.offsetLeft + element.offsetWidth / 2;
+      const targetScroll = pillCenter - trackCenter;
+      if (smooth) {
+        tickerTrack.scrollTo({ left: targetScroll, behavior: 'smooth' });
+      } else {
+        tickerTrack.scrollLeft = targetScroll;
+      }
+    }
+
+    function handleLoopBoundary() {
+      if (isResetting) return;
+      if (!singleSetWidth) singleSetWidth = calculateSetWidth();
+      if (!singleSetWidth) return;
+      const currentScroll = tickerTrack.scrollLeft;
+
+      if (currentScroll >= singleSetWidth * 1.8) {
+        isResetting = true;
+        tickerTrack.style.scrollBehavior = 'auto';
+        tickerTrack.scrollLeft = currentScroll - singleSetWidth;
+        tickerTrack.style.scrollBehavior = '';
+        setTimeout(() => { isResetting = false; }, 50);
+      } else if (currentScroll <= singleSetWidth * 0.2) {
+        isResetting = true;
+        tickerTrack.style.scrollBehavior = 'auto';
+        tickerTrack.scrollLeft = currentScroll + singleSetWidth;
+        tickerTrack.style.scrollBehavior = '';
+        setTimeout(() => { isResetting = false; }, 50);
+      }
+    }
+
+    let scrollTimeout = null;
+    tickerTrack.addEventListener('scroll', () => {
+      handleLoopBoundary();
+      updateCenterActivePill();
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        handleLoopBoundary();
+        updateCenterActivePill();
+      }, 80);
+    });
+
+    function goToSoftwareByIndex(idx) {
+      const total = softwareList.length;
+      let targetIdx = (idx + total) % total;
+      currentSoftwareIndex = targetIdx;
+      const targetItem = softwareList[targetIdx];
+      const targetPill = allPills.find(p => p.getAttribute('data-filter') === targetItem.id && p.getAttribute('data-set') === '1');
+      if (targetPill) {
+        scrollPillToCenter(targetPill, true);
+        updateShowcase(targetItem.id);
+      }
+    }
+
+    if (counterPrevBtn) counterPrevBtn.addEventListener('click', () => goToSoftwareByIndex(currentSoftwareIndex - 1));
+    if (counterNextBtn) counterNextBtn.addEventListener('click', () => goToSoftwareByIndex(currentSoftwareIndex + 1));
+
+    allPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        const targetSoftware = pill.getAttribute('data-filter');
+        scrollPillToCenter(pill, true);
+        if (targetSoftware) updateShowcase(targetSoftware);
+      });
+    });
+
+    let isDown = false;
+    let startX = 0;
+    let scrollStart = 0;
+
+    tickerTrack.addEventListener('mousedown', (e) => {
+      isDown = true;
+      tickerTrack.classList.add('cursor-grabbing');
+      startX = e.pageX - tickerTrack.offsetLeft;
+      scrollStart = tickerTrack.scrollLeft;
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (isDown) {
+        isDown = false;
+        tickerTrack.classList.remove('cursor-grabbing');
+      }
+    });
+
+    tickerTrack.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - tickerTrack.offsetLeft;
+      const walk = (x - startX) * 1.5;
+      tickerTrack.scrollLeft = scrollStart - walk;
+    });
+
+    window.addEventListener('load', () => {
+      singleSetWidth = calculateSetWidth();
+      const middleSetEpanet = allPills.find(p => p.getAttribute('data-filter') === 'EPANET' && p.getAttribute('data-set') === '1');
+      if (middleSetEpanet) {
+        scrollPillToCenter(middleSetEpanet, false);
+        updateCenterActivePill();
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      singleSetWidth = calculateSetWidth();
+      handleLoopBoundary();
+      updateCenterActivePill();
+    });
+</script>
+</body>
+</html>
